@@ -2,17 +2,27 @@ const API_BASE_URL = 'https://pokeapi.co/api/v2';
 const pokemonList = document.getElementById('pokemon-list');
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
+const typeFilter = document.getElementById('type-filter');
 const modal = document.getElementById('pokemon-modal');
 const modalClose = document.getElementsByClassName('close')[0];
 const pokemonDetails = document.getElementById('pokemon-details');
+const prevPageBtn = document.getElementById('prev-page');
+const nextPageBtn = document.getElementById('next-page');
+const pageInfo = document.getElementById('page-info');
 
-async function fetchPokemonList(limit = 20, offset = 0) {
+let currentPage = 1;
+const itemsPerPage = 20;
+let totalPokemon = 0;
+let allPokemon = [];
+let filteredPokemon = [];
+
+async function fetchAllPokemon() {
     try {
-        const response = await fetch(`${API_BASE_URL}/pokemon?limit=${limit}&offset=${offset}`);
+        const response = await fetch(`${API_BASE_URL}/pokemon?limit=1000`);
         const data = await response.json();
         return data.results;
     } catch (error) {
-        console.error('Error fetching Pokemon list:', error);
+        console.error('Error fetching all Pokemon:', error);
     }
 }
 
@@ -26,6 +36,16 @@ async function fetchPokemonDetails(url) {
     }
 }
 
+async function fetchPokemonTypes() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/type`);
+        const data = await response.json();
+        return data.results;
+    } catch (error) {
+        console.error('Error fetching Pokemon types:', error);
+    }
+}
+
 function createPokemonCard(pokemon) {
     const card = document.createElement('div');
     card.classList.add('pokemon-card');
@@ -33,6 +53,7 @@ function createPokemonCard(pokemon) {
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
         <h3>${pokemon.name}</h3>
         <p>ID: ${pokemon.id}</p>
+        <p>Types: ${pokemon.types.map(type => type.type.name).join(', ')}</p>
     `;
     card.addEventListener('click', () => showPokemonDetails(pokemon));
     return card;
@@ -59,37 +80,64 @@ function showPokemonDetails(pokemon) {
     modal.style.display = 'block';
 }
 
-async function displayPokemonList() {
-    const pokemons = await fetchPokemonList();
+function displayPokemonList(page) {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pokemonsToDisplay = filteredPokemon.slice(startIndex, endIndex);
+
     pokemonList.innerHTML = '';
     
-    for (const pokemon of pokemons) {
-        const details = await fetchPokemonDetails(pokemon.url);
-        const card = createPokemonCard(details);
+    for (const pokemon of pokemonsToDisplay) {
+        const card = createPokemonCard(pokemon);
         pokemonList.appendChild(card);
     }
+
+    updatePaginationButtons();
+    updatePageInfo();
 }
 
-function searchPokemon() {
+function updatePaginationButtons() {
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === Math.ceil(filteredPokemon.length / itemsPerPage);
+}
+
+function updatePageInfo() {
+    const totalPages = Math.ceil(filteredPokemon.length / itemsPerPage);
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+}
+
+function filterPokemon() {
     const searchTerm = searchInput.value.toLowerCase();
-    const pokemonCards = pokemonList.getElementsByClassName('pokemon-card');
-    
-    for (const card of pokemonCards) {
-        const name = card.querySelector('h3').textContent.toLowerCase();
-        if (name.includes(searchTerm)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    }
+    const selectedType = typeFilter.value.toLowerCase();
+
+    filteredPokemon = allPokemon.filter(pokemon => {
+        const nameMatch = pokemon.name.toLowerCase().includes(searchTerm);
+        const typeMatch = selectedType === '' || pokemon.types.some(type => type.type.name.toLowerCase() === selectedType);
+        return nameMatch && typeMatch;
+    });
+
+    currentPage = 1;
+    displayPokemonList(currentPage);
 }
 
-searchButton.addEventListener('click', searchPokemon);
+async function initializeTypeFilter() {
+    const types = await fetchPokemonTypes();
+    types.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.name;
+        option.textContent = type.name.charAt(0).toUpperCase() + type.name.slice(1);
+        typeFilter.appendChild(option);
+    });
+}
+
+searchButton.addEventListener('click', filterPokemon);
 searchInput.addEventListener('keyup', (event) => {
     if (event.key === 'Enter') {
-        searchPokemon();
+        filterPokemon();
     }
 });
+
+typeFilter.addEventListener('change', filterPokemon);
 
 modalClose.addEventListener('click', () => {
     modal.style.display = 'none';
@@ -101,5 +149,27 @@ window.addEventListener('click', (event) => {
     }
 });
 
-// Initial Pokemon list display
-displayPokemonList();
+prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        displayPokemonList(currentPage);
+    }
+});
+
+nextPageBtn.addEventListener('click', () => {
+    if (currentPage < Math.ceil(filteredPokemon.length / itemsPerPage)) {
+        currentPage++;
+        displayPokemonList(currentPage);
+    }
+});
+
+async function initializePokedex() {
+    const pokemonList = await fetchAllPokemon();
+    allPokemon = await Promise.all(pokemonList.map(pokemon => fetchPokemonDetails(pokemon.url)));
+    filteredPokemon = [...allPokemon];
+    await initializeTypeFilter();
+    displayPokemonList(currentPage);
+}
+
+// Initialize the Pokedex
+initializePokedex();

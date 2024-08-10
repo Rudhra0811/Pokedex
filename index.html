@@ -15,7 +15,19 @@
             <input type="text" id="search-input" placeholder="Search Pokémon">
             <button id="search-button">Search</button>
         </div>
+        <div id="filter-container">
+            <label for="type-filter">Filter by Type:</label>
+            <select id="type-filter">
+                <option value="">All Types</option>
+                <!-- Pokemon types will be dynamically added here -->
+            </select>
+        </div>
         <div id="pokemon-list"></div>
+        <div id="pagination">
+            <button id="prev-page">Previous</button>
+            <span id="page-info"></span>
+            <button id="next-page">Next</button>
+        </div>
     </main>
     <div id="pokemon-modal" class="modal">
         <div class="modal-content">

@@ -28,7 +28,7 @@ main {
 #search-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 #search-input {
@@ -54,10 +54,30 @@ main {
     background-color: #2a3a9f;
 }
 
+#filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+#filter-container label {
+    margin-right: 0.5rem;
+}
+
+#type-filter {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
 #pokemon-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .pokemon-card {
@@ -77,6 +97,38 @@ main {
 .pokemon-card img {
     width: 120px;
     height: 120px;
+}
+
+#pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+#pagination button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #3b4cca;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#pagination button:hover {
+    background-color: #2a3a9f;
+}
+
+#pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#page-info {
+    margin: 0 1rem;
+    font-size: 1rem;
 }
 
 .modal {
