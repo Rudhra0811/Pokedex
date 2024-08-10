@@ -2,6 +2,9 @@ const API_BASE_URL = 'https://pokeapi.co/api/v2';
 const pokemonList = document.getElementById('pokemon-list');
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
+const modal = document.getElementById('pokemon-modal');
+const modalClose = document.getElementsByClassName('close')[0];
+const pokemonDetails = document.getElementById('pokemon-details');
 
 async function fetchPokemonList(limit = 20, offset = 0) {
     try {
@@ -31,7 +34,29 @@ function createPokemonCard(pokemon) {
         <h3>${pokemon.name}</h3>
         <p>ID: ${pokemon.id}</p>
     `;
+    card.addEventListener('click', () => showPokemonDetails(pokemon));
     return card;
+}
+
+function showPokemonDetails(pokemon) {
+    pokemonDetails.innerHTML = `
+        <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+        <h2>${pokemon.name}</h2>
+        <div class="pokemon-info">
+            <p><strong>Height:</strong> ${pokemon.height / 10}m</p>
+            <p><strong>Weight:</strong> ${pokemon.weight / 10}kg</p>
+            <p><strong>Base Experience:</strong> ${pokemon.base_experience}</p>
+            <p><strong>Types:</strong> ${pokemon.types.map(type => type.type.name).join(', ')}</p>
+            <p><strong>Abilities:</strong> ${pokemon.abilities.map(ability => ability.ability.name).join(', ')}</p>
+            <p><strong>Base Stats:</strong></p>
+        </div>
+        <div class="pokemon-stats">
+            ${pokemon.stats.map(stat => `
+                <p>${stat.stat.name}: ${stat.base_stat}</p>
+            `).join('')}
+        </div>
+    `;
+    modal.style.display = 'block';
 }
 
 async function displayPokemonList() {
@@ -63,6 +88,16 @@ searchButton.addEventListener('click', searchPokemon);
 searchInput.addEventListener('keyup', (event) => {
     if (event.key === 'Enter') {
         searchPokemon();
+    }
+});
+
+modalClose.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
+
+window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+        modal.style.display = 'none';
     }
 });
 
