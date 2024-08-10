@@ -32,7 +32,21 @@
     <div id="pokemon-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <div id="pokemon-details"></div>
+            <div id="pokemon-details">
+                <div class="pokemon-header"></div>
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="basic-info">Basic Info</button>
+                    <button class="tab-button" data-tab="stats">Stats</button>
+                    <button class="tab-button" data-tab="moves">Moves</button>
+                    <button class="tab-button" data-tab="evolution">Evolution</button>
+                </div>
+                <div class="tab-content">
+                    <div id="basic-info" class="tab-pane active"></div>
+                    <div id="stats" class="tab-pane"></div>
+                    <div id="moves" class="tab-pane"></div>
+                    <div id="evolution" class="tab-pane"></div>
+                </div>
+            </div>
         </div>
     </div>
     <footer>

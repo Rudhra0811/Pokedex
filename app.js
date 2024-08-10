@@ -4,6 +4,7 @@ const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
 const typeFilter = document.getElementById('type-filter');
 const modal = document.getElementById('pokemon-modal');
+const modalContent = modal.querySelector('.modal-content');
 const modalClose = document.getElementsByClassName('close')[0];
 const pokemonDetails = document.getElementById('pokemon-details');
 const prevPageBtn = document.getElementById('prev-page');
@@ -12,7 +13,6 @@ const pageInfo = document.getElementById('page-info');
 
 let currentPage = 1;
 const itemsPerPage = 20;
-let totalPokemon = 0;
 let allPokemon = [];
 let filteredPokemon = [];
 
@@ -46,9 +46,10 @@ async function fetchPokemonTypes() {
     }
 }
 
-function createPokemonCard(pokemon) {
+function createPokemonCard(pokemon, index) {
     const card = document.createElement('div');
     card.classList.add('pokemon-card');
+    card.style.animationDelay = `${index * 50}ms`;
     card.innerHTML = `
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
         <h3>${pokemon.name}</h3>
@@ -60,24 +61,50 @@ function createPokemonCard(pokemon) {
 }
 
 function showPokemonDetails(pokemon) {
-    pokemonDetails.innerHTML = `
+    const header = pokemonDetails.querySelector('.pokemon-header');
+    header.innerHTML = `
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
         <h2>${pokemon.name}</h2>
+    `;
+
+    const basicInfo = document.getElementById('basic-info');
+    basicInfo.innerHTML = `
         <div class="pokemon-info">
             <p><strong>Height:</strong> ${pokemon.height / 10}m</p>
             <p><strong>Weight:</strong> ${pokemon.weight / 10}kg</p>
             <p><strong>Base Experience:</strong> ${pokemon.base_experience}</p>
             <p><strong>Types:</strong> ${pokemon.types.map(type => type.type.name).join(', ')}</p>
             <p><strong>Abilities:</strong> ${pokemon.abilities.map(ability => ability.ability.name).join(', ')}</p>
-            <p><strong>Base Stats:</strong></p>
         </div>
-        <div class="pokemon-stats">
+    `;
+
+    const stats = document.getElementById('stats');
+    stats.innerHTML = `
+        <h3>Base Stats</h3>
+        <div class="pokemon-info">
             ${pokemon.stats.map(stat => `
-                <p>${stat.stat.name}: ${stat.base_stat}</p>
+                <p><strong>${stat.stat.name}:</strong> ${stat.base_stat}</p>
             `).join('')}
         </div>
     `;
+
+    const moves = document.getElementById('moves');
+    moves.innerHTML = `
+        <h3>Moves</h3>
+        <ul>
+            ${pokemon.moves.slice(0, 10).map(move => `
+                <li>${move.move.name}</li>
+            `).join('')}
+        </ul>
+        <p>Showing 10 out of ${pokemon.moves.length} moves</p>
+    `;
+
     modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+    
+    document.querySelector('.tab-button[data-tab="basic-info"]').click();
 }
 
 function displayPokemonList(page) {
@@ -87,10 +114,10 @@ function displayPokemonList(page) {
 
     pokemonList.innerHTML = '';
     
-    for (const pokemon of pokemonsToDisplay) {
-        const card = createPokemonCard(pokemon);
+    pokemonsToDisplay.forEach((pokemon, index) => {
+        const card = createPokemonCard(pokemon, index);
         pokemonList.appendChild(card);
-    }
+    });
 
     updatePaginationButtons();
     updatePageInfo();
@@ -120,14 +147,27 @@ function filterPokemon() {
     displayPokemonList(currentPage);
 }
 
-async function initializeTypeFilter() {
-    const types = await fetchPokemonTypes();
-    types.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.name;
-        option.textContent = type.name.charAt(0).toUpperCase() + type.name.slice(1);
-        typeFilter.appendChild(option);
+function initializeTypeFilter() {
+    fetchPokemonTypes().then(types => {
+        types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.name;
+            option.textContent = type.name.charAt(0).toUpperCase() + type.name.slice(1);
+            typeFilter.appendChild(option);
+        });
     });
+}
+
+function handleTabClick(event) {
+    const tabs = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-pane');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    const tabId = event.target.getAttribute('data-tab');
+    document.getElementById(tabId).classList.add('active');
 }
 
 searchButton.addEventListener('click', filterPokemon);
@@ -140,12 +180,18 @@ searchInput.addEventListener('keyup', (event) => {
 typeFilter.addEventListener('change', filterPokemon);
 
 modalClose.addEventListener('click', () => {
-    modal.style.display = 'none';
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 });
 
 window.addEventListener('click', (event) => {
     if (event.target === modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
     }
 });
 
@@ -163,11 +209,15 @@ nextPageBtn.addEventListener('click', () => {
     }
 });
 
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', handleTabClick);
+});
+
 async function initializePokedex() {
     const pokemonList = await fetchAllPokemon();
     allPokemon = await Promise.all(pokemonList.map(pokemon => fetchPokemonDetails(pokemon.url)));
     filteredPokemon = [...allPokemon];
-    await initializeTypeFilter();
+    initializeTypeFilter();
     displayPokemonList(currentPage);
 }
 
