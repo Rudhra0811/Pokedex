@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <header>
         <h1>Pokédex</h1>
         <div class="dark-mode-toggle">
             <input type="checkbox" id="dark-mode-toggle" class="dark-mode-toggle__checkbox">
             <label for="dark-mode-toggle" class="dark-mode-toggle__label">
-                <span class="dark-mode-toggle__slider"></span>
+                <div class="ball"></div>
             </label>
         </div>
     </header>
-    <main>
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Search Pokémon">
-            <button id="search-button">Search</button>
+    <div class="pokedex-container">
+        <div class="screen">
+            <div id="search-container">
+                <input type="text" id="search-input" placeholder="Search Pokémon">
+                <button id="search-button">Search</button>
+            </div>
+            <div id="filter-container">
+                <label for="type-filter">Filter by Type:</label>
+                <select id="type-filter">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div id="pokemon-list"></div>
         </div>
-        <div id="filter-container">
-            <label for="type-filter">Filter by Type:</label>
-            <select id="type-filter">
-                <option value="">All Types</option>
-                <!-- Pokemon types will be dynamically added here -->
-            </select>
-        </div>
-        <button id="compare-button" disabled>Compare Selected Pokémon</button>
-        <div id="pokemon-list"></div>
         <div id="pagination">
             <button id="prev-page">Previous</button>
             <span id="page-info"></span>
             <button id="next-page">Next</button>
         </div>
-    </main>
+        <button id="compare-button" disabled>Compare Selected</button>
+    </div>
+
     <div id="pokemon-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -58,17 +59,14 @@
             </div>
         </div>
     </div>
+
     <div id="comparison-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Pokémon Comparison</h2>
             <div id="comparison-content"></div>
         </div>
     </div>
-    <footer>
-        <p>&copy; 2024 Pokédex Project</p>
-    </footer>
+
     <script src="app.js"></script>
 </body>
-
 </html>
