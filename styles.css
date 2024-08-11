@@ -1,3 +1,158 @@
+:root {
+    --bg-color: #f4f4f4;
+    --text-color: #333;
+    --card-bg-color: #fff;
+    --header-bg-color: #e3350d;
+    --header-text-color: #fff;
+    --button-bg-color: #3b4cca;
+    --button-text-color: #fff;
+    --button-hover-bg-color: #2a3a9f;
+    --input-bg-color: #fff;
+    --input-border-color: #ccc;
+    --modal-bg-color: #fefefe;
+    --modal-text-color: #333;
+    --close-btn-color: #aaa;
+    --close-btn-hover-color: #000;
+    --tab-bg-color: #f1f1f1;
+    --tab-active-bg-color: #3b4cca;
+    --tab-active-text-color: #fff;
+    --footer-bg-color: #333;
+    --footer-text-color: #fff;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg-color: #2a2a2a;
+    --header-bg-color: #1a1a1a;
+    --header-text-color: #e0e0e0;
+    --button-bg-color: #4a4a4a;
+    --button-text-color: #e0e0e0;
+    --button-hover-bg-color: #5a5a5a;
+    --input-bg-color: #3a3a3a;
+    --input-border-color: #4a4a4a;
+    --modal-bg-color: rgba(0, 0, 0, 0.8);
+    --modal-text-color: #e0e0e0;
+    --close-btn-color: #e0e0e0;
+    --close-btn-hover-color: #fff;
+    --tab-bg-color: #3a3a3a;
+    --tab-active-bg-color: #4a4a4a;
+    --tab-active-text-color: #e0e0e0;
+    --footer-bg-color: #1a1a1a;
+    --footer-text-color: #e0e0e0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header {
+    background-color: var(--header-bg-color);
+    color: var(--header-text-color);
+    text-align: center;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dark-mode-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.dark-mode-toggle__checkbox {
+    display: none;
+}
+
+.dark-mode-toggle__label {
+    width: 50px;
+    height: 25px;
+    background-color: #ccc;
+    border-radius: 25px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode-toggle__slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 21px;
+    height: 21px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.dark-mode-toggle__checkbox:checked+.dark-mode-toggle__label {
+    background-color: #4a5bda;
+}
+
+.dark-mode-toggle__checkbox:checked+.dark-mode-toggle__label .dark-mode-toggle__slider {
+    transform: translateX(25px);
+}
+
+/* Update existing styles to use CSS variables */
+.pokemon-card {
+    background-color: var(--card-bg-color);
+    /* ... (other styles remain unchanged) ... */
+}
+
+#search-input {
+    background-color: var(--input-bg-color);
+    border-color: var(--input-border-color);
+    color: var(--text-color);
+}
+
+#search-button,
+#compare-button,
+#pagination button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+}
+
+#search-button:hover,
+#compare-button:hover,
+#pagination button:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+.modal-content {
+    background-color: var(--modal-bg-color);
+    color: var(--modal-text-color);
+}
+
+.close {
+    color: var(--close-btn-color);
+}
+
+.close:hover,
+.close:focus {
+    color: var(--close-btn-hover-color);
+}
+
+.tab-button {
+    background-color: var(--tab-bg-color);
+    color: var(--text-color);
+}
+
+.tab-button.active {
+    background-color: var(--tab-active-bg-color);
+    color: var(--tab-active-text-color);
+}
+
+footer {
+    background-color: var(--footer-bg-color);
+    color: var(--footer-text-color);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;

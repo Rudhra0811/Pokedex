@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <header>
         <h1>Pokédex</h1>
+        <div class="dark-mode-toggle">
+            <input type="checkbox" id="dark-mode-toggle" class="dark-mode-toggle__checkbox">
+            <label for="dark-mode-toggle" class="dark-mode-toggle__label">
+                <span class="dark-mode-toggle__slider"></span>
+            </label>
+        </div>
     </header>
     <main>
         <div id="search-container">
@@ -62,4 +70,5 @@
     </footer>
     <script src="app.js"></script>
 </body>
+
 </html>

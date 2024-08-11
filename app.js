@@ -14,6 +14,22 @@ const compareButton = document.getElementById('compare-button');
 const comparisonModal = document.getElementById('comparison-modal');
 const comparisonContent = document.getElementById('comparison-content');
 const selectedPokemon = new Set();
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+function initDarkMode() {
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.checked = true;
+    }
+}
+
+darkModeToggle.addEventListener('change', toggleDarkMode);
 
 let currentPage = 1;
 const itemsPerPage = 20;
@@ -355,7 +371,9 @@ async function initializePokedex() {
     initializeTypeFilter();
     displayPokemonList(currentPage);
     updateCompareButton();
+    initDarkMode();
 }
+
 
 window.addEventListener('click', (event) => {
     if (event.target === comparisonModal) {
