@@ -36,6 +36,26 @@ async function fetchPokemonDetails(url) {
     }
 }
 
+async function fetchPokemonSpecies(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/pokemon-species/${id}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching Pokemon species:', error);
+    }
+}
+
+async function fetchEvolutionChain(url) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching evolution chain:', error);
+    }
+}
+
 async function fetchPokemonTypes() {
     try {
         const response = await fetch(`${API_BASE_URL}/type`);
@@ -54,17 +74,27 @@ function createPokemonCard(pokemon, index) {
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
         <h3>${pokemon.name}</h3>
         <p>ID: ${pokemon.id}</p>
-        <p>Types: ${pokemon.types.map(type => type.type.name).join(', ')}</p>
+        <div class="type-container">
+            ${pokemon.types.map(type => createTypeLabel(type.type.name)).join('')}
+        </div>
     `;
     card.addEventListener('click', () => showPokemonDetails(pokemon));
     return card;
 }
 
-function showPokemonDetails(pokemon) {
+async function showPokemonDetails(pokemon) {
+    const species = await fetchPokemonSpecies(pokemon.id);
+    const evolutionChain = await fetchEvolutionChain(species.evolution_chain.url);
+
     const header = pokemonDetails.querySelector('.pokemon-header');
     header.innerHTML = `
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
-        <h2>${pokemon.name}</h2>
+        <div>
+            <h2>${pokemon.name}</h2>
+            <div class="type-container">
+                ${pokemon.types.map(type => createTypeLabel(type.type.name)).join('')}
+            </div>
+        </div>
     `;
 
     const basicInfo = document.getElementById('basic-info');
@@ -73,7 +103,6 @@ function showPokemonDetails(pokemon) {
             <p><strong>Height:</strong> ${pokemon.height / 10}m</p>
             <p><strong>Weight:</strong> ${pokemon.weight / 10}kg</p>
             <p><strong>Base Experience:</strong> ${pokemon.base_experience}</p>
-            <p><strong>Types:</strong> ${pokemon.types.map(type => type.type.name).join(', ')}</p>
             <p><strong>Abilities:</strong> ${pokemon.abilities.map(ability => ability.ability.name).join(', ')}</p>
         </div>
     `;
@@ -99,12 +128,36 @@ function showPokemonDetails(pokemon) {
         <p>Showing 10 out of ${pokemon.moves.length} moves</p>
     `;
 
+    const evolution = document.getElementById('evolution');
+    evolution.innerHTML = `
+        <h3>Evolution Chain</h3>
+        <div class="evolution-chain">
+            ${await getEvolutionChainHtml(evolutionChain.chain)}
+        </div>
+    `;
+
     modal.style.display = 'block';
     setTimeout(() => {
         modal.classList.add('show');
     }, 10);
-    
+
     document.querySelector('.tab-button[data-tab="basic-info"]').click();
+}
+
+async function getEvolutionChainHtml(chain) {
+    let html = '';
+    const pokemon = await fetchPokemonDetails(`${API_BASE_URL}/pokemon/${chain.species.name}`);
+    html += `
+        <div class="evolution-stage">
+            <img src="${pokemon.sprites.front_default}" alt="${chain.species.name}">
+            <p>${chain.species.name}</p>
+        </div>
+    `;
+    if (chain.evolves_to.length > 0) {
+        html += '<div class="evolution-arrow">→</div>';
+        html += await getEvolutionChainHtml(chain.evolves_to[0]);
+    }
+    return html;
 }
 
 function displayPokemonList(page) {
@@ -113,7 +166,7 @@ function displayPokemonList(page) {
     const pokemonsToDisplay = filteredPokemon.slice(startIndex, endIndex);
 
     pokemonList.innerHTML = '';
-    
+
     pokemonsToDisplay.forEach((pokemon, index) => {
         const card = createPokemonCard(pokemon, index);
         pokemonList.appendChild(card);
@@ -161,10 +214,10 @@ function initializeTypeFilter() {
 function handleTabClick(event) {
     const tabs = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-pane');
-    
+
     tabs.forEach(tab => tab.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
-    
+
     event.target.classList.add('active');
     const tabId = event.target.getAttribute('data-tab');
     document.getElementById(tabId).classList.add('active');
@@ -219,6 +272,10 @@ async function initializePokedex() {
     filteredPokemon = [...allPokemon];
     initializeTypeFilter();
     displayPokemonList(currentPage);
+}
+
+function createTypeLabel(type) {
+    return `<span class="type-label ${type}">${type}</span>`;
 }
 
 // Initialize the Pokedex
