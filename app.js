@@ -10,6 +10,10 @@ const pokemonDetails = document.getElementById('pokemon-details');
 const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
 const pageInfo = document.getElementById('page-info');
+const compareButton = document.getElementById('compare-button');
+const comparisonModal = document.getElementById('comparison-modal');
+const comparisonContent = document.getElementById('comparison-content');
+const selectedPokemon = new Set();
 
 let currentPage = 1;
 const itemsPerPage = 20;
@@ -66,11 +70,83 @@ async function fetchPokemonTypes() {
     }
 }
 
+function getMaxStats(pokemonArray) {
+    const maxStats = {};
+    pokemonArray.forEach(pokemon => {
+        pokemon.stats.forEach(stat => {
+            if (!maxStats[stat.stat.name] || stat.base_stat > maxStats[stat.stat.name]) {
+                maxStats[stat.stat.name] = stat.base_stat;
+            }
+        });
+    });
+    return maxStats;
+}
+
+compareButton.addEventListener('click', showComparisonModal);
+
+comparisonModal.querySelector('.close').addEventListener('click', () => {
+    comparisonModal.classList.remove('show');
+    setTimeout(() => {
+        comparisonModal.style.display = 'none';
+    }, 300);
+});
+
+function showComparisonModal() {
+    comparisonContent.innerHTML = '';
+    const pokemonArray = Array.from(selectedPokemon);
+    const maxStats = getMaxStats(pokemonArray);
+
+    pokemonArray.forEach(pokemon => {
+        const pokemonElement = document.createElement('div');
+        pokemonElement.classList.add('comparison-pokemon');
+        pokemonElement.innerHTML = `
+            <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+            <h3>${pokemon.name}</h3>
+            <div class="type-container">
+                ${pokemon.types.map(type => createTypeLabel(type.type.name)).join('')}
+            </div>
+            ${pokemon.stats.map(stat => `
+                <div class="comparison-stat">
+                    <span>${stat.stat.name}</span>
+                    <div class="comparison-stat-bar" style="width: ${(stat.base_stat / maxStats[stat.stat.name]) * 100}%"></div>
+                    <span>${stat.base_stat}</span>
+                </div>
+            `).join('')}
+        `;
+        comparisonContent.appendChild(pokemonElement);
+    });
+
+    comparisonModal.style.display = 'block';
+    setTimeout(() => {
+        comparisonModal.classList.add('show');
+    }, 10);
+}
+
+function handleCompareCheckbox(checkbox, pokemon) {
+    if (checkbox.checked) {
+        if (selectedPokemon.size >= 3) {
+            alert('You can only compare up to 3 Pokémon at a time.');
+            checkbox.checked = false;
+            return;
+        }
+        selectedPokemon.add(pokemon);
+    } else {
+        selectedPokemon.delete(pokemon);
+    }
+    updateCompareButton();
+}
+
+function updateCompareButton() {
+    compareButton.disabled = selectedPokemon.size < 2;
+}
+
+
 function createPokemonCard(pokemon, index) {
     const card = document.createElement('div');
     card.classList.add('pokemon-card');
     card.style.animationDelay = `${index * 50}ms`;
     card.innerHTML = `
+        <input type="checkbox" class="compare-checkbox" data-id="${pokemon.id}">
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
         <h3>${pokemon.name}</h3>
         <p>ID: ${pokemon.id}</p>
@@ -78,7 +154,13 @@ function createPokemonCard(pokemon, index) {
             ${pokemon.types.map(type => createTypeLabel(type.type.name)).join('')}
         </div>
     `;
-    card.addEventListener('click', () => showPokemonDetails(pokemon));
+    card.addEventListener('click', (event) => {
+        if (event.target.classList.contains('compare-checkbox')) {
+            handleCompareCheckbox(event.target, pokemon);
+        } else {
+            showPokemonDetails(pokemon);
+        }
+    });
     return card;
 }
 
@@ -272,7 +354,17 @@ async function initializePokedex() {
     filteredPokemon = [...allPokemon];
     initializeTypeFilter();
     displayPokemonList(currentPage);
+    updateCompareButton();
 }
+
+window.addEventListener('click', (event) => {
+    if (event.target === comparisonModal) {
+        comparisonModal.classList.remove('show');
+        setTimeout(() => {
+            comparisonModal.style.display = 'none';
+        }, 300);
+    }
+});
 
 function createTypeLabel(type) {
     return `<span class="type-label ${type}">${type}</span>`;

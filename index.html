@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <header>
         <h1>Pokédex</h1>
@@ -24,6 +22,7 @@
                 <!-- Pokemon types will be dynamically added here -->
             </select>
         </div>
+        <button id="compare-button" disabled>Compare Selected Pokémon</button>
         <div id="pokemon-list"></div>
         <div id="pagination">
             <button id="prev-page">Previous</button>
@@ -51,10 +50,16 @@
             </div>
         </div>
     </div>
+    <div id="comparison-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Pokémon Comparison</h2>
+            <div id="comparison-content"></div>
+        </div>
+    </div>
     <footer>
         <p>&copy; 2024 Pokédex Project</p>
     </footer>
     <script src="app.js"></script>
 </body>
-
 </html>

@@ -539,3 +539,84 @@ footer {
 .pokemon-header .type-container {
     justify-content: flex-start;
 }
+
+#compare-button {
+    display: block;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #3b4cca;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#compare-button:hover {
+    background-color: #2a3a9f;
+}
+
+#compare-button:active {
+    transform: scale(0.95);
+}
+
+#compare-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pokemon-card {
+    /* ... (existing styles) ... */
+    position: relative;
+}
+
+.pokemon-card .compare-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+#comparison-modal .modal-content {
+    max-width: 90%;
+    overflow-x: auto;
+}
+
+#comparison-content {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.comparison-pokemon {
+    flex: 1;
+    min-width: 200px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.comparison-pokemon img {
+    width: 120px;
+    height: 120px;
+}
+
+.comparison-pokemon h3 {
+    margin: 0.5rem 0;
+}
+
+.comparison-stat {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem 0;
+}
+
+.comparison-stat-bar {
+    height: 10px;
+    background-color: #3b4cca;
+    border-radius: 5px;
+    transition: width 0.5s ease-out;
+}
